@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export const config = { runtime: 'nodejs' };
 
+// ✨ 1. SubmitBody 타입에 UTM 필드들을 추가합니다.
 type SubmitBody = {
   type: 'phone' | 'online';
   site?: string;
@@ -20,6 +21,17 @@ type SubmitBody = {
   petBirthDate?: string;
   petRegNumber?: string;
   petNeutered?: string;
+
+  // UTM 필드
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  landing_page?: string;
+  referrer?: string;
+  first_utm?: string;
+  last_utm?: string;
 };
 
 const { GH_TOKEN, GH_REPO_FULLNAME } = process.env;
@@ -44,7 +56,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     type,
     site = 'unknown',
     name = '',
-    phone = '',
     petName,
   } = body;
 
@@ -54,14 +65,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const requestKo = type === 'phone' ? '전화' : '온라인';
-  // ✨ 제목 생성 로직 수정: 가입자이름(펫이름)
   const title = `[${requestKo}] ${name}(${petName || '펫이름 미입력'}) / ${site}`;
   
   const labels = [`type:${type}`, `site:${site}`];
 
-  // ✨ body에 있는 모든 정보를 그대로 payload로 사용
-  const payload = { ...body, requestedAt: new Date().toISOString() };
-  delete (payload as any).headers; // 불필요한 헤더 정보 제거
+  // ✨ 2. payload 생성 방식을 수정하여, form에서 보낸 모든 정보를 받도록 합니다.
+  const payload = {
+    ...body, // form에서 보낸 모든 데이터를 그대로 포함
+    requestedAt: new Date().toISOString(),
+    ua: (req.headers['user-agent'] || '').toString().slice(0, 200),
+    ip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').toString(),
+  };
+  
+  if ('headers' in payload) {
+    delete (payload as any).headers;
+  }
 
   const bodyMd = '```json\n' + JSON.stringify(payload, null, 2) + '\n```';
 
@@ -89,3 +107,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ ok: false, error: 'Internal Server Error', detail: e?.message || String(e) });
   }
 }
+

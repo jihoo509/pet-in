@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
+import UtmHiddenFields from './UtmHiddenFields'; // ✨ 1. UTM 컴포넌트 불러오기
 
 interface OnlineAnalysisFormProps {
   title?: string;
@@ -63,18 +64,24 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
       petNeutered: '',
     });
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  // ✨ 2. event 타입을 HTMLFormElement로 바꿔줍니다.
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
     
+    // ✨ 3. 숨겨진 UTM 필드를 포함한 모든 폼 데이터를 읽어옵니다.
+    const form = event.currentTarget;
+    const formElements = Object.fromEntries(new FormData(form).entries());
+
     const now = new Date();
     const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
 
     try {
+      // ✨ 4. payload 생성 방식을 수정합니다.
       const payload = {
         type: 'online' as const,
-        site: '펫보험', // 또는 현재 사이트에 맞게 수정
+        site: '펫보험',
         name: formData.name.trim(),
         phone: `010-${(formData.phoneNumber || '').trim()}`,
         rrnFront: formData.birthDateFirst.trim(),
@@ -87,6 +94,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         petRegNumber: formData.petRegNumber.trim(),
         petNeutered: formData.petNeutered,
         requestedAt: kstDate.toISOString(),
+        
+        // 읽어온 UTM 데이터를 payload에 합쳐줍니다.
+        ...formElements
       };
 
       const res = await fetch('/api/submit', {
@@ -127,6 +137,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-3">
+          {/* ✨ 5. 비밀 입력 칸(UTM 정보)을 폼 안에 추가합니다. */}
+          <UtmHiddenFields />
+
           {/* 가입자 정보 */}
           <div className="space-y-2">
             <label className="text-white text-base block">가입자 이름</label>
@@ -142,16 +155,15 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           </div>
           <div className="space-y-2">
             <label className="text-white text-base block">가입자 성별</label>
-            {/* ✨ 수정됨: 가입자 성별 아이콘 추가 */}
             <div className="flex h-12 bg-white rounded-md overflow-hidden">
-                <Button type="button" onClick={() => handleInputChange('gender', '남')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.gender === '남' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formData.gender === '남' ? 'bg-orange-400' : 'bg-gray-300'}`}>👨</div>
-                    <span>남</span>
-                </Button>
-                <Button type="button" onClick={() => handleInputChange('gender', '여')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.gender === '여' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formData.gender === '여' ? 'bg-orange-400' : 'bg-gray-300'}`}>👩</div>
-                    <span>여</span>
-                </Button>
+              <Button type="button" onClick={() => handleInputChange('gender', '남')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.gender === '남' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formData.gender === '남' ? 'bg-orange-400' : 'bg-gray-300'}`}>👨</div>
+                <span>남</span>
+              </Button>
+              <Button type="button" onClick={() => handleInputChange('gender', '여')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.gender === '여' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formData.gender === '여' ? 'bg-orange-400' : 'bg-gray-300'}`}>👩</div>
+                <span>여</span>
+              </Button>
             </div>
           </div>
           <div className="space-y-2">
@@ -168,7 +180,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           {/* 반려동물 정보 */}
           <div className="space-y-2">
             <label className="text-white text-base block">반려동물 품종</label>
-            {/* ✨ 수정됨: 예시 문구 변경 */}
             <Input placeholder="예 : 강아지 말티즈" value={formData.petBreed} onChange={e => handleInputChange('petBreed', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
           </div>
           <div className="space-y-2">
@@ -177,7 +188,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           </div>
           <div className="space-y-2">
             <label className="text-white text-base block">반려동물 성별</label>
-            {/* ✨ 수정됨: 반려동물 성별 아이콘 추가 */}
             <div className="flex h-12 bg-white rounded-md overflow-hidden">
                 <Button type="button" onClick={() => handleInputChange('petGender', '수컷')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.petGender === '수컷' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xl ${formData.petGender === '수컷' ? 'bg-orange-400' : 'bg-gray-300'}`}>♂</div>
@@ -194,15 +204,14 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             <Input placeholder="8자리 입력 (예: 20230101)" value={formData.petBirthDate} onChange={e => handleInputChange('petBirthDate', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" maxLength={8} required />
           </div>
           <div className="space-y-2">
-            {/* ✨ 수정됨: 라벨 문구 변경 */}
             <label className="text-white text-base block">동물등록번호</label>
             <Input placeholder="선택사항" value={formData.petRegNumber} onChange={e => handleInputChange('petRegNumber', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" />
           </div>
           <div className="space-y-2">
             <label className="text-white text-base block">중성화 여부</label>
             <div className="flex h-12 bg-white rounded-md overflow-hidden">
-                <Button type="button" onClick={() => handleInputChange('petNeutered', '예')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '예' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>예</Button>
-                <Button type="button" onClick={() => handleInputChange('petNeutered', '아니오')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '아니오' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>아니오</Button>
+              <Button type="button" onClick={() => handleInputChange('petNeutered', '예')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '예' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>예</Button>
+              <Button type="button" onClick={() => handleInputChange('petNeutered', '아니오')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '아니오' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>아니오</Button>
             </div>
           </div>
 
@@ -225,3 +234,4 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
     </div>
   );
 }
+
