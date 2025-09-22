@@ -6,6 +6,7 @@ import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
 import { ContentType } from '../lib/policyContents';
 import { Textarea } from './ui/textarea';
+import { User, PawPrint } from 'lucide-react';
 
 interface PhoneConsultationFormProps {
   title?: string;
@@ -145,8 +146,13 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <UtmHiddenFields />
 
-          {/* 가입자 정보 */}
-          <h3 className="text-white font-bold text-lg pt-2">가입자 정보</h3>
+          {/* 가입자 정보 섹션 */}
+          <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center justify-center w-8 h-8 bg-white/10 rounded-full">
+              <User size={18} className="text-white/80" />
+            </div>
+            <h3 className="text-white font-bold text-lg">가입자 정보</h3>
+          </div>
           <div className="space-y-2">
             <label className="text-white text-base block">가입자 이름</label>
             <Input ref={nameInputRef} placeholder="가입자 성함을 입력" value={formData.name} onChange={e => handleInputChange('name', e.target.value)} onFocus={() => handleInputFocus(nameInputRef)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
@@ -171,43 +177,50 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
             </div>
           </div>
 
-          <hr className="border-white/20 my-4" />
-
-          {/* 반려동물 정보 */}
-          <h3 className="text-white font-bold text-lg">반려동물 정보</h3>
-          <div className="space-y-2">
-            <label className="text-white text-base block">반려동물 품종</label>
-            <Input placeholder="예: 강아지 말티즈" value={formData.petBreed} onChange={e => handleInputChange('petBreed', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
-          </div>
-          <div className="space-y-2">
-            <label className="text-white text-base block">반려동물 이름</label>
-            <Input placeholder="우리 아이 이름" value={formData.petName} onChange={e => handleInputChange('petName', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
-          </div>
-          <div className="space-y-2">
-            <label className="text-white text-base block">반려동물 성별</label>
-            <div className="flex h-12 bg-white rounded-md overflow-hidden">
-              <Button type="button" onClick={() => handleInputChange('petGender', '수컷')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.petGender === '수컷' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}> <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xl ${formData.petGender === '수컷' ? 'bg-orange-400' : 'bg-gray-300'}`}>♂</div> <span>수컷</span> </Button>
-              <Button type="button" onClick={() => handleInputChange('petGender', '암컷')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.petGender === '암컷' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}> <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xl ${formData.petGender === '암컷' ? 'bg-orange-400' : 'bg-gray-300'}`}>♀</div> <span>암컷</span> </Button>
+          {/* ✨ 반려동물 정보 섹션 (구분선 강화) */}
+          <div className="pt-6 mt-6 border-t border-dashed border-white/20">
+             <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-white/10 rounded-full">
+                <PawPrint size={18} className="text-white/80" />
+              </div>
+              <h3 className="text-white font-bold text-lg">반려동물 정보</h3>
             </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-white text-base block">반려동물 생년월일</label>
-            <Input placeholder="8자리 입력 (예: 20230101)" value={formData.petBirthDate} onChange={e => handleInputChange('petBirthDate', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" maxLength={8} required />
-          </div>
-          <div className="space-y-2">
-            <label className="text-white text-base block">동물등록번호</label>
-            <Input placeholder="등록 진행했을 시 입력" value={formData.petRegNumber} onChange={e => handleInputChange('petRegNumber', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-white text-base block">중성화 여부</label>
-            <div className="flex h-12 bg-white rounded-md overflow-hidden">
-              <Button type="button" onClick={() => handleInputChange('petNeutered', '예')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '예' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>예</Button>
-              <Button type="button" onClick={() => handleInputChange('petNeutered', '아니오')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '아니오' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>아니오</Button>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <label className="text-white text-base block">반려동물 품종</label>
+                <Input placeholder="예: 강아지 말티즈" value={formData.petBreed} onChange={e => handleInputChange('petBreed', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
+              </div>
+              <div className="space-y-2">
+                <label className="text-white text-base block">반려동물 이름</label>
+                <Input placeholder="우리 아이 이름" value={formData.petName} onChange={e => handleInputChange('petName', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" required />
+              </div>
+              <div className="space-y-2">
+                <label className="text-white text-base block">반려동물 성별</label>
+                <div className="flex h-12 bg-white rounded-md overflow-hidden">
+                  <Button type="button" onClick={() => handleInputChange('petGender', '수컷')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.petGender === '수컷' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}> <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xl ${formData.petGender === '수컷' ? 'bg-orange-400' : 'bg-gray-300'}`}>♂</div> <span>수컷</span> </Button>
+                  <Button type="button" onClick={() => handleInputChange('petGender', '암컷')} className={`flex-1 flex items-center justify-center space-x-2 rounded-none h-full border-0 ${formData.petGender === '암컷' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}> <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xl ${formData.petGender === '암컷' ? 'bg-orange-400' : 'bg-gray-300'}`}>♀</div> <span>암컷</span> </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-white text-base block">반려동물 생년월일</label>
+                <Input placeholder="8자리 입력 (예: 20230101)" value={formData.petBirthDate} onChange={e => handleInputChange('petBirthDate', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" maxLength={8} required />
+              </div>
+              <div className="space-y-2">
+                <label className="text-white text-base block">동물등록번호</label>
+                <Input placeholder="선택사항" value={formData.petRegNumber} onChange={e => handleInputChange('petRegNumber', e.target.value)} className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-white text-base block">중성화 여부</label>
+                <div className="flex h-12 bg-white rounded-md overflow-hidden">
+                  <Button type="button" onClick={() => handleInputChange('petNeutered', '예')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '예' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>예</Button>
+                  <Button type="button" onClick={() => handleInputChange('petNeutered', '아니오')} className={`flex-1 rounded-none h-full border-0 ${formData.petNeutered === '아니오' ? 'bg-[#f59e0b] text-white hover:bg-[#d97706]' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>아니오</Button>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="space-y-2">
-            <label className="text-white text-base block">문의사항</label>
+          <div className="space-y-2 pt-2">
+            <label className="text-white text-base block">문의사항 (선택)</label>
             <Textarea placeholder="궁금한 점이나 특별히 원하는 점이 있다면 자유롭게 적어주세요." value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} className="bg-white border-0 text-gray-800 placeholder:text-gray-500" rows={3}/>
           </div>
 
