@@ -6,7 +6,7 @@ import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
 import { ContentType } from '../lib/policyContents';
 import { Textarea } from './ui/textarea';
-import { User, PawPrint } from 'lucide-react'; // ✨ 아이콘 추가
+import { User, PawPrint } from 'lucide-react';
 
 interface OnlineAnalysisFormProps {
   title?: string;
@@ -146,7 +146,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <UtmHiddenFields />
 
-          {/* ✨ 가입자 정보 섹션 디자인 개선 */}
+          {/* 가입자 정보 섹션 */}
           <div className="flex items-center gap-3 pt-2">
             <div className="flex items-center justify-center w-8 h-8 bg-white/10 rounded-full">
               <User size={18} className="text-white/80" />
@@ -177,8 +177,8 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             </div>
           </div>
 
-          {/* ✨ 반려동물 정보 섹션 디자인 개선 */}
-          <div className="pt-4 mt-4 border-t border-white/10">
+          {/* 반려동물 정보 섹션 */}
+          <div className="pt-6 mt-6 border-t border-dashed border-white/20">
              <div className="flex items-center gap-3 mb-3">
               <div className="flex items-center justify-center w-8 h-8 bg-white/10 rounded-full">
                 <PawPrint size={18} className="text-white/80" />
@@ -218,7 +218,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </div>
             </div>
           </div>
-
+          
           <div className="space-y-2 pt-2">
             <label className="text-white text-base block">문의사항</label>
             <Textarea placeholder="궁금한 점이나 특별히 원하는 점이 있다면 자유롭게 적어주세요." value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} className="bg-white border-0 text-gray-800 placeholder:text-gray-500" rows={3}/>
@@ -245,7 +245,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             <Button
               type="submit"
               disabled={
-                !formData.name || !formData.birthDate || !formData.gender || !formData.phoneNumber ||
+                !formData.name || !formData.birthDate || !formData.gender || !formData.phoneNumber || 
                 !formData.petBreed || !formData.petName || !formData.petGender || !formData.petBirthDate || !formData.petNeutered ||
                 !agreedToPrivacy || !agreedToThirdParty || 
                 isSubmitting
